@@ -1,24 +1,84 @@
-﻿<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
-    <p><a href="http://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+﻿<div class="row">
+    <div class="col-md-4">
+        <h2>Register User</h2>
+        <form action="/Home/Register" id="registerForm" method="post" role="form">
+            <div class="form-group">
+                <label for="email">Email address</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required />
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Password" pattern=".{6,}" required title="6 characters minimum" />
+            </div>
+            <div class="form-group">
+                <label for="passwordConfirm">Password</label>
+                <input type="password" class="form-control" id="passwordConfirm" name="passwordConfirm" placeholder="Confirm Password" required />
+            </div>
+            <div class="form-group">
+                <input type="submit" class="btn btn-primary" value="Register" />
+            </div>
+            <div id="regresult" class="alert" role="alert"></div>
+        </form>
+    </div>
 </div>
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>ASP.NET Web API is a framework that makes it easy to build HTTP services that reach
-        a broad range of clients, including browsers and mobile devices. ASP.NET Web API
-        is an ideal platform for building RESTful applications on the .NET Framework.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301870">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301871">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301872">Learn more &raquo;</a></p>
-    </div>
-</div>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            var password = $('#password'), confirmPassword = $('#passwordConfirm');
+
+            function validatePassword() {
+                // jQuery returns an array of selected objects and
+                // since setCustomValidity is supported by native
+                // input elements and not jquery objects
+                var confPassInput = confirmPassword.get(0);
+
+                if (password.val() != confirmPassword.val()) {
+                    confPassInput.setCustomValidity("Passwords don't match");
+                } else {
+                    confPassInput.setCustomValidity('');
+                }
+            };
+
+            password.on('change', function () {
+                validatePassword();
+            });
+
+            confirmPassword.on('keyup', function () {
+                validatePassword();
+            });
+
+            $('#registerForm').on('submit', function (e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: "POST",
+                    data: $(this).serialize()
+                }).done(function () {
+                    $('#registerForm')[0].reset();
+                    showRegistrationResult(true, 'User registered');
+                }).fail(function (xhr) {
+                    showRegistrationResult(false, xhr.statusText);
+                });
+            });
+
+            function showRegistrationResult(success, msg) {
+                var regResult = $('#regresult');
+
+                regResult.removeClass('alert-danger').removeClass('alert-success');
+
+                if (success) {
+                    regResult.addClass('alert-success');
+                    setTimeout(function () {
+                        $(regResult).hide();
+                    }, 5000);
+                } else {
+                    regResult.addClass('alert-danger');
+                }
+                regResult.html(msg).show();
+            }
+        });
+    </script>
+}
