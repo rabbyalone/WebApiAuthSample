@@ -25,6 +25,9 @@ namespace WebApiAuthSample
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
+
+            // Enforce HTTPS protocol
+            config.Filters.Add(new Filters.RequireWebApiHttpsAttribute());
         }
     }
 }
