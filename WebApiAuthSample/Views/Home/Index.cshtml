@@ -1,7 +1,7 @@
 ﻿<div class="row">
     <div class="col-md-4">
         <h2>Register User</h2>
-        <form action="/Home/Register" id="registerForm" method="post" role="form">
+        <form action="/Home/Register" id="registerForm" method="POST" role="form">
             <div class="form-group">
                 <label for="email">Email address</label>
                 <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required />
@@ -20,13 +20,42 @@
             <div id="regresult" class="alert" role="alert"></div>
         </form>
     </div>
+    <div class="col-md-5">
+        <h2>Playground</h2>
+        <form action="/Home/GetAccessToken" id="tokenForm" method="POST" role="form">
+            <div class="form-group">
+                <label for="tokenEmail">Email address</label>
+                <input type="email" class="form-control" id="tokenEmail" name="tokenEmail" placeholder="Enter email" required value="anilsezer.com@gmail.com" />
+            </div>
+            <div class="form-group">
+                <label for="tokenPassword">Password</label>
+                <input type="password" class="form-control" id="tokenPassword" name="tokenPassword" placeholder="Password" pattern=".{6,}" required title="6 characters minimum" value="Basbas@6189" />
+            </div>
+            <div class="form-group">
+                <input type="submit" class="btn btn-primary" value="Get Access Token" />
+            </div>
+        </form>
+        <div id="playArea" class="hidden" role="form">
+            <form action="/Home/Logout" method="GET" class="form-horizontal">
+                <div class="form-group">
+                    <input type="submit" class="btn btn-warning" value="Logout" />
+                </div>
+                <div class="form-group">
+                    <label for="token" class="control-label col-sm-2">Token</label>
+                    <input type="text" class="form-control" id="token" name="token" value="" />
+                </div>
+            </form>
+            <hr />
+        </div>
+    </div>
+    <div class="col-md-3"></div>
 </div>
 
 @section scripts
 {
     <script>
         $(document).ready(function () {
-            var password = $('#password'), confirmPassword = $('#passwordConfirm');
+            var password = $('#password'), confirmPassword = $('#passwordConfirm'), registerForm = $('#registerForm');
 
             function validatePassword() {
                 // jQuery returns an array of selected objects and
@@ -40,29 +69,6 @@
                     confPassInput.setCustomValidity('');
                 }
             };
-
-            password.on('change', function () {
-                validatePassword();
-            });
-
-            confirmPassword.on('keyup', function () {
-                validatePassword();
-            });
-
-            $('#registerForm').on('submit', function (e) {
-                e.preventDefault();
-
-                $.ajax({
-                    url: $(this).attr('action'),
-                    type: "POST",
-                    data: $(this).serialize()
-                }).done(function () {
-                    $('#registerForm')[0].reset();
-                    showRegistrationResult(true, 'User registered');
-                }).fail(function (xhr) {
-                    showRegistrationResult(false, xhr.statusText);
-                });
-            });
 
             function showRegistrationResult(success, msg) {
                 var regResult = $('#regresult');
@@ -79,6 +85,43 @@
                 }
                 regResult.html(msg).show();
             }
+
+            password.on('change', function () {
+                validatePassword();
+            });
+
+            confirmPassword.on('keyup', function () {
+                validatePassword();
+            });
+
+            registerForm.on('submit', function (e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: "POST",
+                    data: $(this).serialize()
+                }).done(function () {
+                    $('#registerForm')[0].reset();
+                    showRegistrationResult(true, 'User registered');
+                }).fail(function (xhr) {
+                    showRegistrationResult(false, xhr.statusText);
+                });
+            });
+
+            $('#tokenForm').on('submit', function (e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: "POST",
+                    data: $(this).serialize()
+                }).done(function (tokenObj) {
+                    $('#token').val(tokenObj.AccessToken);
+                    $('#tokenForm').addClass('hidden');
+                    $('#playArea').removeClass('hidden');
+                });
+            });
         });
     </script>
 }
